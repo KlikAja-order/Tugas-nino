@@ -3,168 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kegiatan Pembelajaran Dari Luar Kelas</title>
+    <title>Laporan Kegiatan Pembelajaran Dari Luar Kelas</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1e293b;
-            padding: 20px;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f1;
         }
-        .main-title {
-            font-family: 'Fredoka', sans-serif;
-            color: #0c343d;
-        }
-        .theme-title {
+        .title-font {
             font-family: 'Playfair Display', serif;
-            color: #0c343d;
         }
-        /* Ukuran Poster Proporsional Sesuai Gambar Asli */
-        .poster-canvas {
-            width: 780px;
-            background-color: #f1ebd9;
+        /* Mengunci rasio layout agar pas proporsinya seperti poster */
+        .poster-container {
+            width: 800px;
+            min-height: 1180px;
+            background: linear-gradient(to bottom, #fcfbf7 0%, #f4f6f0 100%);
             position: relative;
-            box-sizing: border-box;
-        }
-        /* Style box konten putih tulang dengan border tipis kelabu */
-        .content-box {
-            background-color: #f9f8f3;
-            border: 1px solid #dcd7c9;
-            border-radius: 16px;
-        }
-        /* Sembunyikan input file standar */
-        .hide-file-input {
-            display: none;
-        }
-        .upload-zone {
-            cursor: pointer;
-            position: relative;
-            background-color: #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
-            border: 2px dashed #9ca3af;
         }
-        .upload-zone img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        /* Efek Glassmorphic halus untuk card */
+        .premium-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(229, 231, 235, 0.6);
+        }
+        /* Sembunyikan input file bawaan browser */
+        .file-input-hidden {
             display: none;
         }
-        .upload-zone.has-img img {
-            display: block;
+        /* Gaya untuk area upload foto */
+        .photo-slot {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
-        .upload-zone.has-img .placeholder-text {
-            display: none;
+        .photo-slot:hover .upload-overlay {
+            opacity: 1;
         }
-        .upload-zone:hover .hover-overlay {
-            display: flex;
-        }
-        .hover-overlay {
-            display: none;
+        .upload-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 11px;
-        }
-        /* Mengatur agar saat cetak/render tombol download hilang */
-        @media print {
-            .no-print { display: none; }
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center">
+<body class="flex flex-col items-center justify-center p-6 bg-slate-800 min-h-screen">
 
-    <div class="mb-4 no-print flex items-center gap-3">
-        <button onclick="prosesCetakHD()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-lg shadow-md cursor-pointer transition-all text-sm">
-            <i class="fa-solid fa-file-image mr-1"></i> Download Gambar HD (.PNG)
+    <div class="mb-6 flex gap-4 no-print">
+        <button onclick="downloadPoster()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 cursor-pointer transition-all">
+            <i class="fa-solid fa-download"></i> Download Gambar Super HD (PNG)
         </button>
-        <span class="text-slate-400 text-xs italic">*Klik kotak di area dokumentasi foto untuk memasukkan foto Anda.</span>
+        <span class="text-slate-300 text-sm flex items-center italic">
+            *Tips: Klik pada foto di galeri untuk menggantinya dengan foto Anda sendiri.
+        </span>
     </div>
 
-    <div id="capture-area" class="poster-canvas p-6 shadow-2xl relative overflow-hidden">
+    <div id="poster-area" class="poster-container p-8 shadow-2xl rounded-2xl flex flex-col justify-between">
         
-        <div class="absolute top-4 left-4 w-20 opacity-40"><i class="fa-solid fa-mountain text-4xl text-stone-400"></i></div>
-        <div class="absolute top-4 right-12 text-amber-400 text-4xl opacity-80"><i class="fa-solid fa-sun"></i></div>
-        <div class="absolute top-8 right-32 text-stone-300 text-2xl opacity-60"><i class="fa-solid fa-cloud"></i></div>
+        <div class="absolute top-4 right-8 flex gap-2 opacity-20">
+            <i class="fa-solid fa-cloud text-4xl text-amber-400"></i>
+        </div>
 
-        <div class="text-center mt-2 mb-4 relative z-10">
-            <h1 class="main-title text-3xl font-bold tracking-tight uppercase leading-none">
+        <div class="text-center relative z-10 my-2">
+            <h1 class="text-4xl font-extrabold tracking-tight text-emerald-950 uppercase leading-none drop-shadow-sm">
                 Kegiatan Pembelajaran
             </h1>
-            <h2 class="main-title text-4xl font-black tracking-normal uppercase text-emerald-800 mt-1">
+            <h2 class="text-5xl font-black tracking-wide text-emerald-800 uppercase mt-1 drop-shadow">
                 Dari Luar Kelas
             </h2>
-            <div class="inline-block bg-emerald-800 text-white text-[11px] font-medium px-5 py-1 rounded-full mt-2 tracking-wide">
+            <div class="inline-block bg-emerald-900 text-emerald-50 text-xs font-medium px-6 py-1.5 rounded-full mt-3 tracking-wider shadow-sm">
                 Belajar di luar kelas, ilmu didapat, hati dikuatkan
             </div>
         </div>
 
-        <div class="grid grid-cols-12 gap-4 items-start relative z-10">
+        <div class="grid grid-cols-12 gap-4 mt-4 items-start relative z-10">
             
             <div class="col-span-5 flex flex-col gap-4">
                 
-                <div class="content-box p-4">
-                    <div class="inline-flex items-center gap-1.5 bg-emerald-800 text-white text-[10px] font-bold px-3 py-1 rounded-full mb-3">
-                        <i class="fa-solid fa-pen-to-square"></i> 1. JUDUL KEGIATAN
+                <div class="premium-card p-4 rounded-2xl shadow-sm border-l-4 border-emerald-700">
+                    <div class="flex items-center gap-2 bg-emerald-800 text-white text-xs font-bold px-3 py-1 rounded-full w-max mb-3">
+                        <i class="fa-solid fa-clipboard-list"></i> 1. JUDUL KEGIATAN
                     </div>
                     <div class="text-center py-2">
-                        <h3 class="text-xl font-bold text-emerald-900 tracking-wide uppercase">OUTING CLASS</h3>
-                        <div class="border-b border-dashed border-stone-300 my-2 w-full"></div>
-                        <div class="text-[11px] text-stone-600 flex items-center justify-center gap-1.5 mt-1">
-                            <i class="fa-solid fa-calendar-days text-emerald-700"></i>
-                            <span>Tanggal: <strong class="text-stone-800 font-bold">17 – 20 Mei 2026</strong></span>
-                        </div>
+                        <h3 class="text-2xl font-black text-emerald-900 tracking-wide uppercase">OUTING CLASS</h3>
+                        <div class="border-b border-dashed border-emerald-300 my-2 w-full"></div>
+                        <p class="text-xs text-gray-600 flex items-center justify-center gap-2 mt-1">
+                            <i class="fa-solid fa-calendar-days text-emerald-700 text-sm"></i> 
+                            <span>Tanggal: <strong class="text-gray-800 font-semibold">17 – 20 Mei 2026</strong></span>
+                        </p>
                     </div>
                 </div>
 
-                <div class="content-box p-4">
-                    <div class="inline-flex items-center gap-1.5 bg-emerald-800 text-white text-[10px] font-bold px-3 py-1 rounded-full mb-3">
+                <div class="premium-card p-4 rounded-2xl shadow-sm border-l-4 border-emerald-700">
+                    <div class="flex items-center gap-2 bg-emerald-800 text-white text-xs font-bold px-3 py-1 rounded-full w-max mb-3">
                         <i class="fa-solid fa-camera"></i> 3. DOKUMENTASI FOTO
                     </div>
                     
-                    <div class="flex flex-col gap-2">
-                        <div id="box-upload-1" class="upload-zone aspect-[4/2.3] rounded-xl" onclick="bukaPilihFile(1)">
-                            <div class="placeholder-text text-center p-2 text-stone-400 text-[11px]">
-                                <i class="fa-solid fa-plus-circle text-lg block mb-0.5 text-stone-400"></i> Klik Upload Foto 1
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <div class="photo-slot aspect-[4/2.2] bg-gray-200 rounded-xl relative shadow-inner group" onclick="triggerUpload(1)">
+                            <img id="img-preview-1" src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-xl" alt="Dokumentasi 1">
+                            <div class="upload-overlay rounded-xl">
+                                <span class="text-white text-xs font-medium"><i class="fa-solid fa-pen-to-square mr-1"></i> Ganti Foto 1</span>
                             </div>
-                            <img id="view-img-1" alt="Foto 1">
-                            <div class="hover-overlay rounded-xl"><i class="fa-solid fa-sync mr-1"></i> Ganti</div>
-                            <input type="file" id="file-act-1" class="hide-file-input" accept="image/*" onchange="prosesPreview(event, 1)">
+                            <input type="file" id="input-file-1" class="file-input-hidden" accept="image/*" onchange="previewImage(event, 1)">
                         </div>
-                        <div id="box-upload-2" class="upload-zone aspect-[4/2.3] rounded-xl" onclick="bukaPilihFile(2)">
-                            <div class="placeholder-text text-center p-2 text-stone-400 text-[11px]">
-                                <i class="fa-solid fa-plus-circle text-lg block mb-0.5 text-stone-400"></i> Klik Upload Foto 2
+                        <div class="photo-slot aspect-[4/2.2] bg-gray-200 rounded-xl relative shadow-inner group" onclick="triggerUpload(2)">
+                            <img id="img-preview-2" src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-xl" alt="Dokumentasi 2">
+                            <div class="upload-overlay rounded-xl">
+                                <span class="text-white text-xs font-medium"><i class="fa-solid fa-pen-to-square mr-1"></i> Ganti Foto 2</span>
                             </div>
-                            <img id="view-img-2" alt="Foto 2">
-                            <div class="hover-overlay rounded-xl"><i class="fa-solid fa-sync mr-1"></i> Ganti</div>
-                            <input type="file" id="file-act-2" class="hide-file-input" accept="image/*" onchange="prosesPreview(event, 2)">
+                            <input type="file" id="input-file-2" class="file-input-hidden" accept="image/*" onchange="previewImage(event, 2)">
                         </div>
-                        <div id="box-upload-3" class="upload-zone aspect-[4/2.3] rounded-xl" onclick="bukaPilihFile(3)">
-                            <div class="placeholder-text text-center p-2 text-stone-400 text-[11px]">
-                                <i class="fa-solid fa-plus-circle text-lg block mb-0.5 text-stone-400"></i> Klik Upload Foto 3
+                        <div class="photo-slot aspect-[4/2.2] bg-gray-200 rounded-xl relative shadow-inner group" onclick="triggerUpload(3)">
+                            <img id="img-preview-3" src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-xl" alt="Dokumentasi 3">
+                            <div class="upload-overlay rounded-xl">
+                                <span class="text-white text-xs font-medium"><i class="fa-solid fa-pen-to-square mr-1"></i> Ganti Foto 3</span>
                             </div>
-                            <img id="view-img-3" alt="Foto 3">
-                            <div class="hover-overlay rounded-xl"><i class="fa-solid fa-sync mr-1"></i> Ganti</div>
-                            <input type="file" id="file-act-3" class="hide-file-input" accept="image/*" onchange="prosesPreview(event, 3)">
+                            <input type="file" id="input-file-3" class="file-input-hidden" accept="image/*" onchange="previewImage(event, 3)">
                         </div>
-                        <div id="box-upload-4" class="upload-zone aspect-[4/2.3] rounded-xl" onclick="bukaPilihFile(4)">
-                            <div class="placeholder-text text-center p-2 text-stone-400 text-[11px]">
-                                <i class="fa-solid fa-plus-circle text-lg block mb-0.5 text-stone-400"></i> Klik Upload Foto 4
+                        <div class="photo-slot aspect-[4/2.2] bg-gray-200 rounded-xl relative shadow-inner group" onclick="triggerUpload(4)">
+                            <img id="img-preview-4" src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-xl" alt="Dokumentasi 4">
+                            <div class="upload-overlay rounded-xl">
+                                <span class="text-white text-xs font-medium"><i class="fa-solid fa-pen-to-square mr-1"></i> Ganti Foto 4</span>
                             </div>
-                            <img id="view-img-4" alt="Foto 4">
-                            <div class="hover-overlay rounded-xl"><i class="fa-solid fa-sync mr-1"></i> Ganti</div>
-                            <input type="file" id="file-act-4" class="hide-file-input" accept="image/*" onchange="prosesPreview(event, 4)">
+                            <input type="file" id="input-file-4" class="file-input-hidden" accept="image/*" onchange="previewImage(event, 4)">
                         </div>
                     </div>
                 </div>
@@ -173,158 +147,162 @@
 
             <div class="col-span-7 flex flex-col gap-4">
                 
-                <div class="content-box p-4">
-                    <div class="inline-flex items-center gap-1.5 bg-emerald-800 text-white text-[10px] font-bold px-3 py-1 rounded-full mb-2">
+                <div class="premium-card p-4 rounded-2xl shadow-sm border-l-4 border-emerald-700">
+                    <div class="flex items-center gap-2 bg-emerald-800 text-white text-xs font-bold px-3 py-1 rounded-full w-max mb-2">
                         <i class="fa-solid fa-leaf"></i> 2. TEMA KEGIATAN
                     </div>
-                    <div class="text-center my-1">
-                        <p class="theme-title text-base font-bold italic leading-snug">
+                    <div class="text-center my-1 px-2">
+                        <p class="title-font text-lg font-bold italic text-emerald-950 leading-snug">
                             "Menjelajah Ciptaan Allah, Menguatkan Iman, Menajamkan Nalar"
                         </p>
                     </div>
                     
-                    <p class="text-[9px] uppercase font-bold tracking-wider text-stone-500 mt-2 mb-1.5 border-b pb-0.5 border-stone-200">Destinasi Wisata Edukasi:</p>
-                    <div class="grid grid-cols-5 gap-1 text-center text-[8.5px] font-bold text-stone-800">
-                        <div class="flex flex-col items-center"><div class="w-7 h-7 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center mb-0.5"><i class="fa-solid fa-apple-whole text-orange-600 text-xs"></i></div>Petik Apel</div>
-                        <div class="flex flex-col items-center"><div class="w-7 h-7 rounded-full bg-sky-100 border border-sky-200 flex items-center justify-center mb-0.5"><i class="fa-solid fa-tree text-sky-600 text-xs"></i></div>Santera De Laponte</div>
-                        <div class="flex flex-col items-center"><div class="w-7 h-7 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center mb-0.5"><i class="fa-solid fa-mosque text-emerald-600 text-xs"></i></div>Masjid Tiban Turen</div>
-                        <div class="flex flex-col items-center"><div class="w-7 h-7 rounded-full bg-red-100 border border-red-200 flex items-center justify-center mb-0.5"><i class="fa-solid fa-circle-play text-red-600 text-xs"></i></div>Jatim Park 1</div>
-                        <div class="flex flex-col items-center"><div class="w-7 h-7 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center mb-0.5"><i class="fa-solid fa-car text-indigo-600 text-xs"></i></div>Museum Angkut</div>
+                    <p class="text-[10px] uppercase font-bold tracking-wider text-emerald-900 mt-2 mb-1.5 border-b pb-0.5 border-gray-200">Destinasi Wisata Edukasi:</p>
+                    <div class="grid grid-cols-5 gap-1 text-center text-[9px] font-bold text-emerald-950">
+                        <div class="flex flex-col items-center"><div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mb-1 shadow-sm"><i class="fa-solid fa-apple-whole text-emerald-700"></i></div>Petik Apel</div>
+                        <div class="flex flex-col items-center"><div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mb-1 shadow-sm"><i class="fa-solid fa-tree text-emerald-700"></i></div>Santera</div>
+                        <div class="flex flex-col items-center"><div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mb-1 shadow-sm"><i class="fa-solid fa-mosque text-emerald-700"></i></div>M. Tiban</div>
+                        <div class="flex flex-col items-center"><div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mb-1 shadow-sm"><i class="fa-solid fa-gopuram text-emerald-700"></i></div>Jatim Park 1</div>
+                        <div class="flex flex-col items-center"><div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mb-1 shadow-sm"><i class="fa-solid fa-car text-emerald-700"></i></div>M. Angkut</div>
                     </div>
                 </div>
 
-                <div class="content-box p-4">
-                    <div class="inline-flex items-center gap-1.5 bg-emerald-800 text-white text-[10px] font-bold px-3 py-1 rounded-full mb-3">
+                <div class="premium-card p-4 rounded-2xl shadow-sm border-l-4 border-emerald-700">
+                    <div class="flex items-center gap-2 bg-emerald-800 text-white text-xs font-bold px-3 py-1 rounded-full w-max mb-3">
                         <i class="fa-solid fa-magnifying-glass"></i> 4. RINGKASAN HASIL OBSERVASI
                     </div>
                     
-                    <div class="space-y-2 text-[10.5px] text-stone-700 leading-relaxed">
-                        <div class="flex gap-2 items-start">
-                            <span class="text-orange-600 mt-0.5 text-xs shrink-0"><i class="fa-solid fa-circle-dot"></i></span>
-                            <div><strong>Petik Apel:</strong> Pengalaman agrowisata edukatif di mana pengunjung bisa memetik dan memakan buah apel langsung dari pohonnya. Edukasi meliputi cara memilih buah yang matang dan pemahaman tentang budidaya apel di dataran tinggi.</div>
+                    <div class="space-y-2.5 text-[11px] text-gray-700 leading-relaxed">
+                        <div class="flex gap-2.5 items-start">
+                            <span class="bg-red-100 text-red-700 p-1 rounded-lg mt-0.5 text-xs w-5 h-5 flex items-center justify-center shrink-0"><i class="fa-solid fa-apple-whole"></i></span>
+                            <div><strong>Petik Apel:</strong> Pengalaman agrowisata edukatif di mana pengunjung bisa memetik dan memakan buah apel langsung dari pohonnya. Edukasi meliputi cara memilih buah yang matang dan pemahaman budidaya apel di dataran tinggi.</div>
                         </div>
-                        <div class="flex gap-2 items-start">
-                            <span class="text-sky-600 mt-0.5 text-xs shrink-0"><i class="fa-solid fa-circle-dot"></i></span>
+                        <div class="flex gap-2.5 items-start">
+                            <span class="bg-purple-100 text-purple-700 p-1 rounded-lg mt-0.5 text-xs w-5 h-5 flex items-center justify-center shrink-0"><i class="fa-solid fa-fresnel-lens"></i></span>
                             <div><strong>Santera De Laponte (Florawisata):</strong> Taman bunga penuh warna dengan konsep ala Eropa dan Jepang. Selain hamparan bunga, terdapat wahana permainan dan bangunan tematik yang sangat populer sebagai spot swafoto.</div>
                         </div>
-                        <div class="flex gap-2 items-start">
-                            <span class="text-emerald-600 mt-0.5 text-xs shrink-0"><i class="fa-solid fa-circle-dot"></i></span>
+                        <div class="flex gap-2.5 items-start">
+                            <span class="bg-emerald-100 text-emerald-700 p-1 rounded-lg mt-0.5 text-xs w-5 h-5 flex items-center justify-center shrink-0"><i class="fa-solid fa-mosque"></i></span>
                             <div><strong>Masjid Tiban Turen:</strong> Kompleks pondok pesantren megah di Turen dengan arsitektur menyerupai kastil unik. Terkenal dengan bangunannya yang sangat detail, lorong-lorong rumit, dan nuansa interior yang menawan.</div>
                         </div>
-                        <div class="flex gap-2 items-start">
-                            <span class="text-red-600 mt-0.5 text-xs shrink-0"><i class="fa-solid fa-circle-dot"></i></span>
-                            <div><strong>Jatim Park 1:</strong> Perpaduan antara taman bermain modern dan wisata edukasi (sains, budaya, dan sejarah). Daya tarik utamanya meliputi wahana pemacu adrenalin, science center, dan kolam renang berukuran besar.</div>
+                        <div class="flex gap-2.5 items-start">
+                            <span class="bg-amber-100 text-amber-600 p-1 rounded-lg mt-0.5 text-xs w-5 h-5 flex items-center justify-center shrink-0"><i class="fa-solid fa-ferry"></i></span>
+                            <div><strong>Jatim Park 1:</strong> Perpaduan antara taman bermain modern dan wisata edukasi (sains, budaya, dan sejarah). Daya tarik utamanya meliputi wahana pemacu adrenalin, <i>science center</i>, dan kolam renang berukuran besar.</div>
                         </div>
-                        <div class="flex gap-2 items-start">
-                            <span class="text-indigo-600 mt-0.5 text-xs shrink-0"><i class="fa-solid fa-circle-dot"></i></span>
+                        <div class="flex gap-2.5 items-start">
+                            <span class="bg-blue-100 text-blue-700 p-1 rounded-lg mt-0.5 text-xs w-5 h-5 flex items-center justify-center shrink-0"><i class="fa-solid fa-car-rear"></i></span>
                             <div><strong>Museum Angkut:</strong> Destinasi wisata yang menggabungkan koleksi alat transportasi dari berbagai penjuru dunia dan lintas zaman. Zona tematiknya menyerupai landmark ikonik luar negeri, seperti kawasan Pecinan dan jalanan bergaya Eropa.</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="content-box p-4">
-                    <div class="inline-flex items-center gap-1.5 bg-amber-600 text-white text-[10px] font-bold px-3 py-1 rounded-full mb-2">
+                <div class="premium-card p-4 rounded-2xl shadow-sm border-l-4 border-emerald-700">
+                    <div class="flex items-center gap-2 bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full w-max mb-2">
                         <i class="fa-solid fa-heart"></i> 5. HIKMAH PEMBELAJARAN
                     </div>
-                    <ul class="list-disc list-inside text-[10.5px] text-stone-700 space-y-1 pl-0.5">
-                        <li><strong>Meningkatkan Motivasi Belajar:</strong> Mengubah rutinitas belajar dari suasana formal di dalam kelas menjadi lebih santai, interaktif, dan menyenangkan, sehingga semangat belajar meningkat.</li>
+                    <ul class="list-disc list-inside text-[11px] text-gray-700 space-y-1 pl-1">
+                        <li><strong class="text-emerald-950">Meningkatkan Motivasi Belajar:</strong> Mengubah rutinitas belajar dari suasana formal di dalam kelas menjadi lebih santai, interaktif, dan menyenangkan, sehingga semangat belajar meningkat.</li>
                     </ul>
                 </div>
 
             </div>
         </div>
 
-        <div class="grid grid-cols-12 gap-4 mt-4 items-stretch">
-            
-            <div class="col-span-5 content-box p-4 flex flex-col justify-between">
+        <div class="grid grid-cols-12 gap-4 mt-4 relative z-10 items-stretch">
+            <div class="col-span-5 premium-card p-4 rounded-2xl shadow-sm border-l-4 border-emerald-700 flex flex-col justify-between">
                 <div>
-                    <div class="inline-flex items-center gap-1.5 bg-emerald-800 text-white text-[10px] font-bold px-3 py-1 rounded-full mb-2">
+                    <div class="flex items-center gap-2 bg-emerald-800 text-white text-xs font-bold px-3 py-1 rounded-full w-max mb-2">
                         <i class="fa-solid fa-users"></i> 6. ANGGOTA KEGIATAN
                     </div>
-                    <ol class="text-[11px] text-stone-800 font-medium space-y-1 pl-1 mt-1">
+                    <ol class="text-xs text-gray-800 font-semibold space-y-1.5 pl-2 mt-2">
                         <li>1. Nino</li>
                         <li>2. Rohmad</li>
                         <li>3. Ahwan</li>
                         <li>4. Afam</li>
                     </ol>
                 </div>
-                <div class="text-[8.5px] text-emerald-950 bg-emerald-50/60 p-2 rounded-lg border border-emerald-100 italic mt-3 text-center leading-tight">
-                    "Barang siapa yang menempuh jalan untuk mencari ilmu, maka Allah akan memudahkan baginya jalan menuju surga." <br><span class="font-bold not-italic text-[8px] text-emerald-900">(HR. Muslim)</span>
+                <div class="text-[9px] text-emerald-900 bg-emerald-50 p-2 rounded-xl border border-emerald-200 italic mt-4 text-center leading-tight">
+                    "Barang siapa yang menempuh jalan untuk mencari ilmu, maka Allah akan memudahkan baginya jalan menuju surga." <br><strong class="font-bold not-italic text-emerald-950 text-[8px]">(HR. Muslim)</strong>
                 </div>
             </div>
 
-            <div class="col-span-7 content-box p-4 flex flex-col justify-between">
+            <div class="col-span-7 premium-card p-4 rounded-2xl shadow-sm border-l-4 border-emerald-700 flex flex-col justify-between">
                 <div>
-                    <div class="inline-flex items-center gap-1.5 bg-blue-800 text-white text-[10px] font-bold px-3 py-1 rounded-full mb-2">
+                    <div class="flex items-center gap-2 bg-blue-800 text-white text-xs font-bold px-3 py-1 rounded-full w-max mb-2">
                         <i class="fa-solid fa-circle-check"></i> 7. KESIMPULAN
                     </div>
-                    <div class="text-[10.5px] text-stone-700 leading-relaxed mt-1">
-                        <strong>Pengalaman Langsung:</strong> Siswa dapat melihat, menyentuh, dan mempraktikkan langsung materi pelajaran di lapangan (seperti museum atau alam). Pengalaman nyata ini membuat pemahaman lebih mendalam dan mudah diingat.
+                    <div class="text-[11px] text-gray-700 mt-2 leading-relaxed">
+                        <strong class="text-emerald-950 block mb-0.5">Pengalaman Langsung:</strong>
+                        Siswa dapat melihat, menyentuh, dan mempraktikkan langsung materi pelajaran di lapangan (seperti museum atau alam). Pengalaman nyata ini membuat pemahaman lebih mendalam dan mudah diingat.
                     </div>
                 </div>
-                <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center text-[9.5px] text-amber-900 italic font-medium mt-2">
+                
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-center text-[10px] text-amber-900 italic font-medium mt-3 leading-snug">
                     "Belajar dari perjalanan, pulang membawa pelajaran, hati penuh syukur dan semangat baru."
                 </div>
             </div>
         </div>
 
-        <div class="mt-4 pt-2 border-t border-stone-200 flex justify-between items-center text-[9px] text-stone-400">
-            <span>Laporan Hasil Pengamatan Edukasi Lapangan</span>
-            <span class="text-emerald-800 font-bold"><i class="fa-solid fa-bus text-amber-500 mr-1"></i> Bus Pariwisata Berangkat</span>
+        <div class="mt-4 pt-2 border-t border-gray-200/60 flex justify-between items-center text-[9px] text-gray-400">
+            <span>&copy; 2026 Jurnal Kegiatan Outing Class Selesai</span>
+            <span class="font-medium text-emerald-800"><i class="fa-solid fa-bus text-xs mr-1 text-amber-500"></i> Premium Report Dashboard Layout</span>
         </div>
 
     </div>
 
     <script>
-        // Trigger klik input file rahasia
-        function bukaPilihFile(idSlot) {
-            document.getElementById(`file-act-${idSlot}`).click();
+        // Trigger klik input file tersembunyi berdasarkan ID slot foto
+        function triggerUpload(slotId) {
+            document.getElementById(`input-file-${slotId}`).click();
         }
 
-        // Handle live preview gambar lokal (Aman dari CORS)
-        function prosesPreview(event, idSlot) {
-            const fileInput = event.target;
-            if (fileInput.files && fileInput.files[0]) {
-                const pembacaFile = new FileReader();
-                pembacaFile.onload = function(e) {
-                    const objekGambar = document.getElementById(`view-img-${idSlot}`);
-                    objekGambar.src = e.target.result;
-                    
-                    const wadahUpload = document.getElementById(`box-upload-${idSlot}`);
-                    wadahUpload.classList.add('has-img');
+        // Handle live preview file foto yang diunggah user
+        function previewImage(event, slotId) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgElement = document.getElementById(`img-preview-${slotId}`);
+                    imgElement.src = e.target.result;
+                    imgElement.classList.remove('object-cover');
+                    imgElement.classList.add('object-cover'); // Memastikan aspect ratio terjaga rapi
                 };
-                pembacaFile.readAsDataURL(fileInput.files[0]);
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // Engine Render Gambar HD tanpa intervensi URL luar (Bebas Error)
-        function prosesCetakHD() {
-            const areaPoster = document.getElementById('capture-area');
+        // Fungsi Render Canvas HD Engine
+        function downloadPoster() {
+            const targetElement = document.getElementById('poster-area');
             
-            // Pengali skala 3x membuat kualitas gambar super jernih / HD saat disimpan
-            const setingRender = {
-                scale: 3, 
-                useCORS: false, 
+            // Konfigurasi scale 3x-4x untuk menjamin kualitas cetak sangat HD tanpa blur
+            const options = {
+                scale: 3.5, 
+                useCORS: true, 
                 allowTaint: true,
-                backgroundColor: "#f1ebd9"
+                backgroundColor: null,
+                logging: false
             };
 
+            // Mengubah cursor menjadi status loading
             document.body.style.cursor = 'wait';
 
-            html2canvas(areaPoster, setingRender).then(canvasHasil => {
-                const urlGambar = canvasHasil.toDataURL("image/png");
-                const berkasLink = document.createElement('a');
-                berkasLink.download = 'Tugas_Outing_Class_HD.png';
-                berkasLink.href = urlGambar;
-                berkasLink.click();
+            html2canvas(targetElement, options).then(canvas => {
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.download = 'Outing_Class_Report_HD_' + new Date().toISOString().slice(0,10) + '.png';
+                link.href = image;
+                link.click();
                 
+                // Kembalikan cursor normal
                 document.body.style.cursor = 'default';
-            }).catch(kesalahan => {
-                console.error("Sistem Error:", kesalahan);
+            }).catch(err => {
+                console.error("Gagal mendownload gambar:", err);
                 document.body.style.cursor = 'default';
-                alert("Gagal memproses gambar. Pastikan semua file foto sudah terunggah dengan benar.");
+                alert("Terjadi kesalahan sistem saat memproses gambar HD.");
             });
         }
     </script>
 </body>
-</html>
+    </html>
+            
